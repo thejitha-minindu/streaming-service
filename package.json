@@ -13,7 +13,7 @@
     "start:api": "node --env-file-if-exists=.env server/index.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test --test-concurrency=1 server/tests/*.test.mjs",
-    "test:ci": "node --test server/tests/auth.test.mjs",
+    "test:ci": "node --test --test-concurrency=1 server/tests/auth.test.mjs server/tests/deployment.test.mjs",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview"
   },

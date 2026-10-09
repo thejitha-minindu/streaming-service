@@ -1,19 +1,10 @@
 import { readConfig, chatConfigured } from './config.mjs';
-import { createStore } from './store.mjs';
-import { createAgent } from './agent.mjs';
-import { createApp } from './app.mjs';
-import { createGeminiAgent } from './gemini.mjs';
-import { createAuth } from './auth.mjs';
+import { createServer } from 'node:http';
+import { createBackend } from './backend.mjs';
 
 try {
   const config = readConfig();
-  const store = createStore(config);
-  const agent = config.chatProvider === 'gemini' ? createGeminiAgent(config, store) : createAgent(config);
-  const server = createApp({ config, store, agent, auth: createAuth(config, store), scope: async user => {
-    const memberStore = await store.registeredAccount(user.id);
-    const memberConfig = { ...config, userId: user.id };
-    return { store: memberStore, agent: config.chatProvider === 'gemini' ? createGeminiAgent(memberConfig, memberStore) : createAgent(memberConfig) };
-  } });
+  const server = createServer(createBackend(config));
   server.requestTimeout = 15000;
   server.headersTimeout = 10000;
   server.listen(config.port, config.host, () => {

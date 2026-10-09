@@ -2,6 +2,8 @@
 
 For publishing this project, see [GitHub setup](docs/github-setup.md). The repository includes a credential-free environment template and automated build/test workflow.
 
+**Vercel hosting:** see [frontend and backend deployment](docs/vercel-deployment.md). The included `api/index.js` and `vercel.json` deploy the backend alongside the Vite frontend. Add your server environment variables in Vercel and set `APP_ORIGIN` to the hosted HTTPS URL, then redeploy. Your existing Supabase data is reused.
+
 **Registration setup:** run [`supabase/005_normal_authentication.sql`](supabase/005_normal_authentication.sql) after the base schema. The backend handles normal email/password sign-up and sign-in; Supabase is only the database. No Auth provider or email-confirmation setup is needed. See [sign-up and sign-in instructions](docs/authentication.md), including local password setup for existing accounts. New users have their own account, membership, wallet and chat; each starts on Paid Premium with $0 demo wallet credit.
 
 **Keep the current user:** if that user has no local password yet, run `npm run user:password`, press Enter at the email prompt and choose a password. This uses `DEMO_USER_ID` and preserves the account, wallet and membership. Sign in at `/signin`, then use **Log out** in the navigation or profile. New users can register at `/signup` with just name, email and password and are signed in immediately.
@@ -125,11 +127,12 @@ npm run build
 
 `npm test` runs the full local suite: supplied SQL in isolated PostgreSQL (PGlite), plus actual HTTP backend/adapter requests to a test upstream. It needs the SQL files but no real credentials. PGlite is a **development dependency only**; the runtime backend uses Node built-ins and Supabase REST.
 
-GitHub Actions runs `npm run test:ci` and `npm run build`. This smaller test suite covers password hashing, registration, sign-in/sign-out, sessions, API access and account isolation using an in-memory test store. CI requires no SQL files or database connection and does not test database migrations or refund transactions. Keep running `npm test` locally when changing database or refund behavior.
+GitHub Actions runs `npm run test:ci` and `npm run build`. This smaller test suite covers password hashing, registration, sign-in/sign-out, sessions, API access, account isolation, and hosted-function routing/body handling using test stores. CI requires no SQL files or database connection and does not test database migrations or refund transactions. Keep running `npm test` locally when changing database or refund behavior.
 
 | File | Purpose |
 | --- | --- |
 | `server/index.mjs`, `server/config.mjs` | Startup/environment validation |
+| `api/index.js`, `vercel.json`, `server/backend.mjs` | Vercel API entry point, routing and shared backend initialization |
 | `server/app.mjs` | Browser APIs and authenticated tools |
 | `server/auth.mjs`, `server/passwords.mjs` | Email/password authentication, scrypt hashes, protected session cookies and sign-out |
 | `server/agent.mjs` | Real Agent Platform protocol adapter |

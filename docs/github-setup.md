@@ -22,7 +22,9 @@ git config user.email "your-email@example.com"
 
 The `.gitignore` excludes `.env`, API keys, dependencies, build output, logs, local database files and editor state. `.env.example` is the credential-free template to commit. Keep `package-lock.json`, application source, public assets, documentation and Supabase SQL scripts in Git.
 
-The GitHub Actions workflow installs locked dependencies, runs `npm run test:ci` (password hashing, registration, sign-in/sign-out, sessions, API access and account isolation using an in-memory test store), and typechecks/builds the frontend. CI does not require SQL files, a database or Supabase, Gemini or Agent Platform credentials. It does not deploy the application or modify your live database. Full database and refund integration tests remain available locally with `npm test` and require the SQL files in `supabase/`.
+The GitHub Actions workflow installs locked dependencies, runs `npm run test:ci` (authentication, API access, account isolation, and hosted-function routing/body handling using test stores), and typechecks/builds the frontend. CI does not require SQL files, a database or Supabase, Gemini or Agent Platform credentials. It does not deploy the application or modify your live database. Full database and refund integration tests remain available locally with `npm test` and require the SQL files in `supabase/`.
+
+For frontend and backend hosting on Vercel, follow [Vercel deployment](vercel-deployment.md). Include the root `api/` folder and `vercel.json` in your commit and configure server environment variables in the Vercel project.
 
 After cloning on another machine:
 

@@ -15,18 +15,27 @@ function authorizeTool(request, secret) {
 }
 async function readBody(request) {
   if (!request.headers['content-type']?.startsWith('application/json')) throw new HttpError(415, 'Send application/json.');
-  let raw = '';
-  for await (const chunk of request) {
-    raw += chunk;
-    if (Buffer.byteLength(raw) > 16384) throw new HttpError(413, 'Request is too large.');
+  let raw;
+  // Vercel may provide a parsed body; local Node requests provide a stream.
+  try {
+    const parsed = request.body;
+    if (parsed !== undefined) raw = typeof parsed === 'string' ? parsed : Buffer.isBuffer(parsed) ? parsed.toString('utf8') : JSON.stringify(parsed);
+  } catch { throw new HttpError(400, 'Invalid JSON body.'); }
+  if (raw === undefined) {
+    raw = '';
+    for await (const chunk of request) {
+      raw += chunk;
+      if (Buffer.byteLength(raw) > 16384) throw new HttpError(413, 'Request is too large.');
+    }
   }
+  if (Buffer.byteLength(raw) > 16384) throw new HttpError(413, 'Request is too large.');
   let body;
   try { body = JSON.parse(raw); } catch { throw new HttpError(400, 'Invalid JSON body.'); }
   if (!body || typeof body !== 'object' || Array.isArray(body)) throw new HttpError(400, 'Expected a JSON object.');
   return body;
 }
 
-export function createApp({ config, store: baseStore, agent: baseAgent, auth, scope }) {
+export function createHandler({ config, store: baseStore, agent: baseAgent, auth, scope }) {
   const activeSessions = new Set();
   const rateLimits = new Map();
   async function locked(sessionId, run) {
@@ -50,7 +59,7 @@ export function createApp({ config, store: baseStore, agent: baseAgent, auth, sc
       account: await store.account(),
     };
   }
-  return createServer(async (request, response) => {
+  return async (request, response) => {
     response.setHeader('Content-Type', 'application/json; charset=utf-8');
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('X-Content-Type-Options', 'nosniff');
@@ -145,5 +154,7 @@ export function createApp({ config, store: baseStore, agent: baseAgent, auth, sc
       response.writeHead(status);
       response.end(JSON.stringify({ error: status === 500 ? 'Unexpected backend error. Please try again.' : error.message }));
     }
-  });
+  };
 }
+
+export function createApp(options) { return createServer(createHandler(options)); }

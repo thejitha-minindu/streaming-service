@@ -37,7 +37,7 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(130000),
   });
-  const data = await response.json().catch(() => ({ error: 'The backend is not reachable. Start the API server and check the Vite proxy.' }));
+  const data = await response.json().catch(() => ({ error: 'The API is unavailable. Check the backend deployment and its configuration.' }));
   if (!response.ok || data.error) {
     if (response.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event('streamsphere-session-expired'));
     throw new ApiError(data.error || 'Request failed. Please try again.', response.status);
