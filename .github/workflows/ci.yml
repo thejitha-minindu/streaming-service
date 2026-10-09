@@ -23,7 +23,7 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
-      - name: Test backend and isolated database
-        run: npm test
+      - name: Test authentication and API access (no SQL required)
+        run: npm run test:ci
       - name: Typecheck and build frontend
         run: npm run build

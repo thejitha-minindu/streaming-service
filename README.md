@@ -123,7 +123,9 @@ npm test
 npm run build
 ```
 
-Tests execute the supplied SQL in isolated PostgreSQL (PGlite), plus actual HTTP backend/adapter requests to a test upstream. They need no real credentials. PGlite is a **development dependency only**; the runtime backend uses Node built-ins and Supabase REST.
+`npm test` runs the full local suite: supplied SQL in isolated PostgreSQL (PGlite), plus actual HTTP backend/adapter requests to a test upstream. It needs the SQL files but no real credentials. PGlite is a **development dependency only**; the runtime backend uses Node built-ins and Supabase REST.
+
+GitHub Actions runs `npm run test:ci` and `npm run build`. This smaller test suite covers password hashing, registration, sign-in/sign-out, sessions, API access and account isolation using an in-memory test store. CI requires no SQL files or database connection and does not test database migrations or refund transactions. Keep running `npm test` locally when changing database or refund behavior.
 
 | File | Purpose |
 | --- | --- |
