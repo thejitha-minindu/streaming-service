@@ -1,0 +1,34 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "StreamSphere demo business tools", "version": "1.0.0" },
+  "servers": [{ "url": "https://YOUR_BACKEND_HOST" }],
+  "security": [{ "toolBearer": [] }],
+  "components": { "securitySchemes": { "toolBearer": { "type": "http", "scheme": "bearer" } } },
+  "paths": {
+    "/api/tools/account": {
+      "get": {
+        "operationId": "get_streamsphere_account",
+        "summary": "Get the signed-in member's subscription, wallet, charge and refund policy",
+        "parameters": [{ "name": "user_id", "in": "query", "required": true, "description": "Verified user_id supplied by the backend in the chat/resume request", "schema": { "type": "string", "format": "uuid" } }],
+        "responses": {
+          "200": { "description": "Current account and policy", "content": { "application/json": { "schema": { "type": "object", "properties": { "account": { "type": "object" }, "policy": { "type": "object" } } } } } },
+          "401": { "description": "Invalid tool credential" }
+        }
+      }
+    },
+    "/api/tools/cancel-subscription": {
+      "post": {
+        "operationId": "cancel_streamsphere_subscription",
+        "summary": "Execute approved cancellation and optional wallet refund atomically",
+        "description": "Call only after approved=true in resume. Use its local consent_id, not the upstream opaque token. This one tool handles cancel_and_refund and cancel_subscription; the database enforces policy, consent and idempotency.",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["consent_id"], "additionalProperties": false, "properties": { "consent_id": { "type": "string", "format": "uuid" } } } } } },
+        "responses": {
+          "200": { "description": "Result and current account", "content": { "application/json": { "schema": { "type": "object", "properties": { "account": { "type": "object" }, "refund_amount_cents": { "type": "integer" }, "already_executed": { "type": "boolean" } } } } } },
+          "401": { "description": "Invalid tool credential" },
+          "404": { "description": "Consent not found" },
+          "409": { "description": "Consent or business policy conflict" }
+        }
+      }
+    }
+  }
+}

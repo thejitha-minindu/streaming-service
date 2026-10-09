@@ -1,0 +1,4 @@
+-- Retired: this file formerly installed Supabase Auth integration.
+-- For new AND existing databases, run 001_schema.sql followed by
+-- 005_normal_authentication.sql instead. The new migration preserves accounts,
+-- balances and profiles while replacing authentication with local passwords.

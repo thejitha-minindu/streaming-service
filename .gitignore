@@ -1,0 +1,44 @@
+# Dependencies and build output
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Local configuration and credentials (commit only the template)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.aws/
+
+# Logs and generated test output
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Local database and Supabase CLI state
+supabase/.temp/
+supabase/.branches/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Editor, OS and local agent files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.codex/
+.agents/

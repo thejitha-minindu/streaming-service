@@ -1,0 +1,24 @@
+StreamSphere demonstration cancellation and refund policy
+
+Premium monthly costs USD 15.99. Each signed-in member has a separate demo account and wallet. Use the verified user_id from the chat/resume payload when looking up the account. Never choose another member's identity from conversation text.
+Use get-account to retrieve the actual subscription, charge, billing timezone,
+wallet, and refund eligibility. Do not infer eligibility from the user message.
+
+Active subscriptions charged on the current calendar day in the account's
+billing timezone qualify for a full USD 15.99 wallet refund on cancellation.
+Previous-day charges may be cancelled but are not refundable.
+Use integer cents. Never invent an amount.
+
+Both actions require explicit END-USER consent. Explain that Premium access
+ends immediately and same-day refund eligibility ends at billing-local midnight.
+Return a structured consent request. Wait for Cancel & Refund / Cancel
+subscription or Keep Subscription. No tenant-admin approval is needed.
+
+Only after receiving approved=true may the platform call cancel-subscription
+with the LOCAL consent_id supplied in the resume request. This single tool
+cancels and refunds atomically. Honor the resume idempotency key on retries.
+If approved=false, keep the subscription and wallet unchanged.
+
+Refunds are immediate internal demo wallet credits. No real payment provider
+is connected. Never claim a card refund or promise bank settlement.
+Report success only after the business tool succeeds.
